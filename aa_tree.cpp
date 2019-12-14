@@ -21,11 +21,11 @@ vessel* skew(vessel *ship) {
 
 		if (ship->parent != NULL) {
 			if (ship == ship->parent->right) { // changing parents
-				t->parent = ship->parent->right;
+				t->parent = ship->parent;
 				t->parent->right = t;
 			}
 			else {
-				t->parent = ship->parent->left;
+				t->parent = ship->parent;
 				t->parent->left = t;
 			}
 		}
@@ -41,11 +41,15 @@ vessel* skew(vessel *ship) {
 }
 
 vessel* split(vessel *ship) {
-	if((ship->right != NULL) && (ship->right->right != NULL) && (ship->right->right->level == ship->level)) {
+	if(ship->right != NULL) {
+	if(ship->right->right != NULL) {
+	if(ship->right->right->level == ship->level) {
 		vessel *r = ship->right;
 
 		if(ship->parent != NULL) {
-			ship->parent->right = r; // changing parents
+			if (ship->parent->right == ship)
+				ship->parent->right = r; // changing parents
+			else ship->parent->left = r;
 			r->parent = ship->parent;
 		}
 
@@ -54,12 +58,13 @@ vessel* split(vessel *ship) {
 			ship->right->parent = ship;
 		
 		r->left = ship; // changing link from right to left
-		if(ship->parent != NULL) {
-			ship->parent = r;
-		}
+		ship->parent = r;
+
 		r->level++; // lifting up the central node
 		cout << "Lift up!" << endl;
 		return r;
+	}
+	}
 	}
 }
 
@@ -91,16 +96,13 @@ void attach_to_fleet(vessel *flagship, vessel *ship) {
 			flagship->right = ship;
 			ship->parent = flagship;
 			ship->level = flagship->level;
-		} else {
-			if (flagship->right->level == flagship->level)
-				attach_to_fleet(flagship->right, ship);
-			else attach_to_fleet(flagship->right, ship);
-		}
-		if (flagship != NULL) {
-			flagship = skew(flagship);
-			if(flagship->parent != NULL)
-				flagship->parent = split(flagship->parent);
-		}
+		} else attach_to_fleet(flagship->right, ship);
+	}
+	if (flagship != NULL) {
+		flagship = skew(flagship);
+	}
+	if (flagship != NULL) {
+		flagship = split(flagship);
 	}
 }
 
@@ -137,16 +139,17 @@ struct record { // the log entry written when ship arrives or leaves the station
 };
 
 int main() {
-	vessel *normandy = create_vessel("SSV Normandy", 1000003, 30, 2);
+	vessel *normandy = create_vessel("SSV Normandy", 1000004, 30, 2);
 	vessel *luna = create_vessel("NSV Luna", 1000001, 25, 6);
 	vessel *cruiser = create_vessel("NMV Icarus", 1000000, 60, 10);
-	vessel *marines = create_vessel("USS Sulaco", 1000002, 60, 12);
-	vessel *pirates = create_vessel("Pirates Shuttle", 1000004, 20, 4);
+	vessel *marines = create_vessel("USS Sulaco", 1000003, 60, 12);
+	vessel *pirates = create_vessel("Pirates Shuttle", 1000005, 20, 4);
+	vessel *strangers = create_vessel("Death Star", 1000002, 10000, 0);
 	attach_to_fleet(normandy, luna);
 	attach_to_fleet(normandy, cruiser);
 	attach_to_fleet(normandy, marines);
 	attach_to_fleet(normandy, pirates);
-	fleet_report(normandy);
+	attach_to_fleet(normandy, strangers);
 	fleet_report(luna);
 	return 0;
 }
