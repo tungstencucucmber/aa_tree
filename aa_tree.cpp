@@ -4,10 +4,6 @@ using namespace std;
 struct vessel {
 	string name; // a ship without a name goes nowhere 
 	unsigned long long int id; // vessel unique number
-	unsigned tonnage; // carrying capacity
-	unsigned current_load; // weight of the cargo the ship is carrying at the moment
-	short route; // vessels are always on route between some destinations
-	short location; // obvious
 
 	unsigned short level; // the technical
 	vessel *parent; // stuff
@@ -38,6 +34,7 @@ vessel* skew(vessel *ship) {
 		ship->parent = t;
 		return t;
 	}
+	return ship;
 }
 
 vessel* split(vessel *ship) {
@@ -61,21 +58,17 @@ vessel* split(vessel *ship) {
 		ship->parent = r;
 
 		r->level++; // lifting up the central node
-		cout << "Lift up!" << endl;
 		return r;
 	}
 	}
 	}
+	return ship;
 }
 
-vessel* create_vessel(string n, unsigned long long int i, unsigned t, short loc) {
+vessel* create_vessel(string n, unsigned long long int i) {
 	vessel *ship = new vessel;
 	ship->name = n;
 	ship->id = i;
-	ship->tonnage = t;
-	ship->current_load = 0;
-	ship->route = 0;
-	ship->location = loc;
 	ship->parent = NULL;
 	ship->left = NULL;
 	ship->right = NULL;
@@ -89,13 +82,13 @@ void attach_to_fleet(vessel *flagship, vessel *ship) {
 		if (flagship->left == NULL) {
 			flagship->left = ship;
 			ship->parent = flagship;
-			ship->level = flagship->level;
+			ship->level = 0;
 		} else attach_to_fleet(flagship->left, ship);
 	} else {
 		if (flagship->right == NULL) {
 			flagship->right = ship;
 			ship->parent = flagship;
-			ship->level = flagship->level;
+			ship->level = 0;
 		} else attach_to_fleet(flagship->right, ship);
 	}
 	if (flagship != NULL) {
@@ -106,7 +99,6 @@ void attach_to_fleet(vessel *flagship, vessel *ship) {
 	}
 }
 
-// add function overloadd for name, etc?
 vessel* find_vessel(vessel *flagship, unsigned long long int target_id) {
 	if(target_id < flagship->id)
 		find_vessel(flagship->left, target_id);
@@ -115,41 +107,23 @@ vessel* find_vessel(vessel *flagship, unsigned long long int target_id) {
 	else return flagship;
 }
 
-// print tree
 void fleet_report(vessel *flagship) {
 	if(flagship->left != NULL)
 		fleet_report(flagship->left);
 	cout << flagship->name << " report:" << endl;
 	cout << "ID: " << flagship->id << endl;
 	cout << "Level: " << flagship->level << endl;
-	// cout << "Route: " << flagship->route << endl;
-	// cout << "Location: " << flagship->location << endl;
-	// cout << "Load: " << flagship->current_load << " t out of " << flagship->tonnage << " t"<< endl;
 	cout << endl;
 	if(flagship->right != NULL)
 		fleet_report(flagship->right);
 }
 
-struct record { // the log entry written when ship arrives or leaves the station
-	unsigned long long int id;
-	short route;
-	short event; // indicates the type of event - arrival (+n) or departure (-n) from exact location (n is inteeger != 0)
-	float time; // obvious
-	record *next; // pointer to the next record in the list
-};
-
 int main() {
-	vessel *normandy = create_vessel("SSV Normandy", 1000004, 30, 2);
-	vessel *luna = create_vessel("NSV Luna", 1000001, 25, 6);
-	vessel *cruiser = create_vessel("NMV Icarus", 1000000, 60, 10);
-	vessel *marines = create_vessel("USS Sulaco", 1000003, 60, 12);
-	vessel *pirates = create_vessel("Pirates Shuttle", 1000005, 20, 4);
-	vessel *strangers = create_vessel("Death Star", 1000002, 10000, 0);
+	vessel *normandy = create_vessel("SSV Normandy", 2);
+	vessel *luna = create_vessel("NSV Luna", 9);
+	vessel *cruiser = create_vessel("NMV Icarus", 5);
 	attach_to_fleet(normandy, luna);
 	attach_to_fleet(normandy, cruiser);
-	attach_to_fleet(normandy, marines);
-	attach_to_fleet(normandy, pirates);
-	attach_to_fleet(normandy, strangers);
-	fleet_report(luna);
+	fleet_report(normandy);
 	return 0;
 }

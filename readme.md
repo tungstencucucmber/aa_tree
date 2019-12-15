@@ -1,1 +1,1 @@
-Self-balancing AA-tree realization.
+Self-balancing AA-tree realization. Inspired by icelaulers.cpp.
