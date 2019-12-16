@@ -12,7 +12,8 @@ struct vessel {
 };
 
 vessel* skew(vessel *ship) {
-	if((ship->left != NULL) && (ship->left->level == ship->level)) {
+	if (ship->left != NULL) {
+	if (ship->left->level == ship->level) {
 		vessel *t = ship->left;
 
 		if (ship->parent != NULL) {
@@ -33,6 +34,7 @@ vessel* skew(vessel *ship) {
 		t->right = ship; // changing link from left to right
 		ship->parent = t;
 		return t;
+	}
 	}
 	return ship;
 }
@@ -128,7 +130,11 @@ vessel* detach_from_fleet(vessel *flagship, unsigned long long int target_id) {
 			if (replaced->parent != NULL)
 				replaced->parent->right = replaced;
 			replaced->left = deleted->left;
+			if (replaced->left != NULL)
+				replaced->left->parent = replaced;
 			replaced->right = deleted->right;
+			if (replaced->right != NULL)
+				replaced->right->parent = replaced;
 			delete deleted;
 			while(t != NULL) {
 				t = skew(t);
