@@ -77,7 +77,7 @@ vessel* create_vessel(string n, unsigned long long int i) {
 }
 
 // attach a vessel to a certain fleet (a node to a tree)
-void attach_to_fleet(vessel *flagship, vessel *ship) {
+vessel* attach_to_fleet(vessel *flagship, vessel *ship) {
 	if (ship->id <= flagship->id) {
 		if (flagship->left == NULL) {
 			flagship->left = ship;
@@ -97,6 +97,7 @@ void attach_to_fleet(vessel *flagship, vessel *ship) {
 	if (flagship != NULL) {
 		flagship = split(flagship);
 	}
+	return flagship;
 }
 
 vessel* find_vessel(vessel *flagship, unsigned long long int target_id) {
@@ -122,8 +123,15 @@ int main() {
 	vessel *normandy = create_vessel("SSV Normandy", 2);
 	vessel *luna = create_vessel("NSV Luna", 9);
 	vessel *cruiser = create_vessel("NMV Icarus", 5);
-	attach_to_fleet(normandy, luna);
-	attach_to_fleet(normandy, cruiser);
-	fleet_report(normandy);
+	vessel *strange_cruiser = create_vessel("Galactica", 7);
+	vessel *smugglers = create_vessel("Millenium Falcon", 12);
+	vessel *starman = create_vessel("Tesla Roadster", 14);
+	vessel *my_fleet = normandy;
+	my_fleet = attach_to_fleet(my_fleet, luna);
+	my_fleet = attach_to_fleet(my_fleet, cruiser);
+	my_fleet = attach_to_fleet(my_fleet, strange_cruiser);
+	my_fleet = attach_to_fleet(my_fleet, smugglers);
+	my_fleet = attach_to_fleet(my_fleet, starman);
+	fleet_report(my_fleet);
 	return 0;
 }
