@@ -2,7 +2,6 @@
 using namespace std;
 
 struct vessel {
-	string name; // a ship without a name goes nowhere 
 	unsigned long long int id; // vessel unique number
 
 	unsigned short level; // the technical
@@ -67,9 +66,8 @@ vessel* split(vessel *ship) {
 	return ship;
 }
 
-vessel* create_vessel(string n, unsigned long long int i) {
+vessel* create_vessel(unsigned long long int i) {
 	vessel *ship = new vessel;
-	ship->name = n;
 	ship->id = i;
 	ship->parent = NULL;
 	ship->left = NULL;
@@ -124,7 +122,6 @@ vessel* detach_from_fleet(vessel *flagship, vessel *ship) {
 				replaced = replaced->right;
 			vessel *t = replaced->parent;
 
-			ship->name = replaced->name;
 			ship->id = replaced->id;
 			replaced->parent->right = NULL;
 			delete replaced;
@@ -143,14 +140,12 @@ void dismiss_fleet(vessel *flagship) {
 		dismiss_fleet(flagship->left);
 	while(flagship->right != NULL)
 		dismiss_fleet(flagship->right);
-	flagship = NULL;
 	delete flagship;
 }
 
 void fleet_report(vessel *flagship) {
 	if(flagship->left != NULL)
 		fleet_report(flagship->left);
-	cout << flagship->name << " report:" << endl;
 	cout << "ID: " << flagship->id << endl;
 	cout << "Level: " << flagship->level << endl;
 	cout << endl;
@@ -159,12 +154,12 @@ void fleet_report(vessel *flagship) {
 }
 
 int main() {
-	vessel *normandy = create_vessel("SSV Normandy", 2);
-	vessel *luna = create_vessel("NSV Luna", 9);
-	vessel *cruiser = create_vessel("NMV Icarus", 5);
-	vessel *strange_cruiser = create_vessel("Galactica", 7);
-	vessel *smugglers = create_vessel("Millenium Falcon", 12);
-	vessel *starman = create_vessel("Tesla Roadster", 14);
+	vessel *normandy = create_vessel(2);
+	vessel *luna = create_vessel(9);
+	vessel *cruiser = create_vessel(5);
+	vessel *strange_cruiser = create_vessel(7);
+	vessel *smugglers = create_vessel(12);
+	vessel *starman = create_vessel(14);
 	vessel *my_fleet = normandy;
 	my_fleet = attach_to_fleet(my_fleet, luna);
 	my_fleet = attach_to_fleet(my_fleet, cruiser);
@@ -173,6 +168,6 @@ int main() {
 	my_fleet = attach_to_fleet(my_fleet, starman);
 	my_fleet = detach_from_fleet(my_fleet, luna);
 	fleet_report(my_fleet);
-	// dismiss_fleet(my_fleet);
+	dismiss_fleet(my_fleet);
 	return 0;
 }
