@@ -112,35 +112,27 @@ vessel* find_vessel(vessel *flagship, unsigned long long int target_id) {
 	else return flagship;
 }
 
-vessel* detach_from_fleet(vessel *flagship, unsigned long long int target_id) {
-	if (find_vessel(flagship, target_id) != NULL) {
-		vessel *deleted = find_vessel(flagship, target_id);
-		if (deleted->left == NULL) {
-			if (deleted->parent != NULL)
-				deleted->parent->right = NULL;
-			delete deleted;
+vessel* detach_from_fleet(vessel *flagship, vessel *ship) {
+	if (find_vessel(flagship, ship->id) != NULL) {
+		if (ship->left == NULL) {
+			if (ship->parent != NULL)
+				ship->parent->right = NULL;
+			delete ship;
 		} else {
-			vessel *replaced = deleted->left;
+			vessel *replaced = ship->left;
 			while (replaced->right != NULL)
 				replaced = replaced->right;
 			vessel *t = replaced->parent;
 
+			ship->name = replaced->name;
+			ship->id = replaced->id;
 			replaced->parent->right = NULL;
-			replaced->parent = deleted->parent;
-			if (replaced->parent != NULL)
-				replaced->parent->right = replaced;
-			replaced->left = deleted->left;
-			if (replaced->left != NULL)
-				replaced->left->parent = replaced;
-			replaced->right = deleted->right;
-			if (replaced->right != NULL)
-				replaced->right->parent = replaced;
-			delete deleted;
-			while(t != NULL) {
-				t = skew(t);
-				t = split(t);
-				t = t->parent;
-			}
+			delete replaced;
+			// while(t != NULL) {
+			// 	t = skew(t);
+			// 	t = split(t);
+			// 	t = t->parent;
+			// }
 		}
 	}
 	return flagship;
@@ -179,7 +171,7 @@ int main() {
 	my_fleet = attach_to_fleet(my_fleet, strange_cruiser);
 	my_fleet = attach_to_fleet(my_fleet, smugglers);
 	my_fleet = attach_to_fleet(my_fleet, starman);
-	// my_fleet = detach_from_fleet(my_fleet, 9);
+	my_fleet = detach_from_fleet(my_fleet, luna);
 	fleet_report(my_fleet);
 	// dismiss_fleet(my_fleet);
 	return 0;
